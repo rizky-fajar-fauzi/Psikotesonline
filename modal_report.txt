@@ -1,0 +1,194 @@
+                <>
+              {/* Participant Demographic Card */}
+              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs sm:text-sm">
+                <div>
+                  <span className="text-slate-500 block">Nama Lengkap:</span>
+                  <span className="font-bold text-slate-900">{selectedSub.participant.name}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block">Email:</span>
+                  <span className="font-semibold text-slate-800">{selectedSub.participant.email}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block">No HP / WA:</span>
+                  <span className="font-semibold text-slate-800">{selectedSub.participant.phone}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 block">Posisi / Org:</span>
+                  <span className="font-semibold text-slate-800">
+                    {selectedSub.participant.position || '-'} ({selectedSub.participant.organization || '-'})
+                  </span>
+                </div>
+              </div>
+
+              {/* Dominant Type Hero Banner */}
+              <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 text-center">
+                <span className="text-xs font-extrabold uppercase tracking-widest text-indigo-400">
+                  Hasil Profil Kepribadian Utama
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-black mt-1">
+                  Tipe {selectedSub.interpretation.mirror?.code || selectedSub.interpretation.primaryType} - {selectedSub.interpretation.mirror?.title || selectedSub.interpretation.title}
+                </h2>
+                <p className="mt-2 text-slate-300 text-xs sm:text-sm max-w-2xl mx-auto leading-relaxed">
+                  {selectedSub.interpretation.mirror?.summary || selectedSub.interpretation.summary}
+                </p>
+              </div>
+
+              
+              {/* Hasil Profil Kepribadian (Mask, Core, Mirror) */}
+              <div className="font-sans text-slate-800 mt-5">
+                {/* BAGIAN ATAS: MASK, CORE, MIRROR (Berisi List Sifat Sesuai Excel) */}
+                <div className="flex flex-wrap gap-5 mb-10">
+                  <div className="flex-1 min-w-[250px] bg-white p-5 border border-slate-200 rounded-lg shadow-sm">
+                    <h3 className="m-0 mb-2.5 text-base underline text-slate-600 font-bold">Mask Public Self</h3>
+                    <div className="font-bold text-[15px] uppercase text-black mb-[15px]">
+                      {selectedSub.interpretation.mask?.code || 'N/A'} - {selectedSub.interpretation.mask?.title || 'TIDAK TERIDENTIFIKASI'}
+                    </div>
+                    <ul className="list-none p-0 m-0 text-sm leading-[1.6]">
+                      {(selectedSub.interpretation.mask?.traits || []).map((trait, idx) => (
+                        <li key={idx} className="mb-1">- {trait}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="flex-1 min-w-[250px] bg-white p-5 border border-slate-200 rounded-lg shadow-sm">
+                    <h3 className="m-0 mb-2.5 text-base underline text-slate-600 font-bold">Core Private Self</h3>
+                    <div className="font-bold text-[15px] uppercase text-black mb-[15px]">
+                      {selectedSub.interpretation.core?.code || 'N/A'} - {selectedSub.interpretation.core?.title || 'TIDAK TERIDENTIFIKASI'}
+                    </div>
+                    <ul className="list-none p-0 m-0 text-sm leading-[1.6]">
+                      {(selectedSub.interpretation.core?.traits || []).map((trait, idx) => (
+                        <li key={idx} className="mb-1">- {trait}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="flex-1 min-w-[250px] bg-white p-5 border border-slate-200 rounded-lg shadow-sm">
+                    <h3 className="m-0 mb-2.5 text-base underline text-slate-600 font-bold">Mirror Perceived Self</h3>
+                    <div className="font-bold text-[15px] uppercase text-black mb-[15px]">
+                      {selectedSub.interpretation.mirror?.code || 'N/A'} - {selectedSub.interpretation.mirror?.title || 'TIDAK TERIDENTIFIKASI'}
+                    </div>
+                    <ul className="list-none p-0 m-0 text-sm leading-[1.6]">
+                      {(selectedSub.interpretation.mirror?.traits || []).map((trait, idx) => (
+                        <li key={idx} className="mb-1">- {trait}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* BAGIAN BAWAH: DESKRIPSI PARAGRAF & JOB MATCH (Berdasarkan Kepribadian Utama) */}
+                <div className="bg-slate-50 p-[25px] rounded-lg border border-slate-200 mb-8">
+                  <h2 className="text-lg mt-0 mb-2.5 uppercase text-slate-800 font-bold">Deskripsi Kepribadian</h2>
+                  <p className="text-[15px] leading-[1.8] text-justify mb-[25px] text-slate-700">
+                    {selectedSub.interpretation.core?.summary || "Deskripsi tidak tersedia untuk profil ini."}
+                  </p>
+
+                  <div className="bg-[#eef7ee] p-[15px] border-l-[5px] border-[#4CAF50] rounded text-sm leading-[1.6] text-slate-900">
+                    <strong className="text-[15px] block mb-1">Kesesuaian Karier (Job Match):</strong>
+                    <span>{selectedSub.interpretation.core?.jobMatch || '-'}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* DISC Scores & Visual Comparison Graph */}
+              
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Score Table */}
+                <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4">
+                  <h4 className="font-bold text-slate-800 text-sm mb-3 flex items-center space-x-2">
+                    <BarChart2 className="w-4 h-4 text-indigo-600" />
+                    <span>Tabel Skor DISC (Tally MMI)</span>
+                  </h4>
+
+                  <table className="w-full text-center text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-200/80 text-slate-700 font-bold">
+                        <th className="p-2 border border-slate-300 text-left">Skor</th>
+                        <th className="p-2 border border-slate-300 text-rose-700">D</th>
+                        <th className="p-2 border border-slate-300 text-amber-700">I</th>
+                        <th className="p-2 border border-slate-300 text-emerald-700">S</th>
+                        <th className="p-2 border border-slate-300 text-blue-700">C</th>
+                        <th className="p-2 border border-slate-300 bg-purple-100 text-purple-900 font-bold">X (◆)</th>
+                        <th className="p-2 border border-slate-300 bg-slate-300 text-slate-900 font-bold">Total (=24)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      <tr>
+                        <td className="p-2 border border-slate-300 font-bold bg-amber-50 text-left">1 ➔ Most (+)</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.most.D}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.most.I}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.most.S}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.most.C}</td>
+                        <td className="p-2 border border-slate-300 bg-purple-50 text-purple-900 font-bold">{selectedSub.tally.most.X || 0}</td>
+                        <td className="p-2 border border-slate-300 font-bold bg-emerald-100 text-emerald-900">
+                          {selectedSub.tally.most.D + selectedSub.tally.most.I + selectedSub.tally.most.S + selectedSub.tally.most.C + (selectedSub.tally.most.X || 0)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="p-2 border border-slate-300 font-bold bg-blue-50 text-left">2 ➔ Least (-)</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.least.D}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.least.I}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.least.S}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.least.C}</td>
+                        <td className="p-2 border border-slate-300 bg-purple-50 text-purple-900 font-bold">{selectedSub.tally.least.X || 0}</td>
+                        <td className="p-2 border border-slate-300 font-bold bg-emerald-100 text-emerald-900">
+                          {selectedSub.tally.least.D + selectedSub.tally.least.I + selectedSub.tally.least.S + selectedSub.tally.least.C + (selectedSub.tally.least.X || 0)}
+                        </td>
+                      </tr>
+                      <tr className="bg-indigo-50 font-bold text-indigo-900">
+                        <td className="p-2 border border-slate-300 text-left">3 ➔ Net (Change)</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.change.D}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.change.I}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.change.S}</td>
+                        <td className="p-2 border border-slate-300">{selectedSub.tally.change.C}</td>
+                        <td className="p-2 border border-slate-300 bg-slate-200 text-slate-400 italic">—</td>
+                        <td className="p-2 border border-slate-300 bg-slate-100 text-slate-400 font-normal">N/A</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <div className="mt-2.5 p-2 bg-purple-50 border border-purple-200 rounded text-[11px] text-purple-950 space-y-0.5">
+                    <p className="font-bold text-purple-900 flex items-center justify-between">
+                      <span>Kalkulasi Total Skor = 24:</span>
+                      <span className="text-[10px] bg-purple-200 text-purple-900 px-1.5 py-0.5 rounded font-black">Poin X (◆) Termasuk</span>
+                    </p>
+                    <p>• Most (+): D({selectedSub.tally.most.D}) + I({selectedSub.tally.most.I}) + S({selectedSub.tally.most.S}) + C({selectedSub.tally.most.C}) + X({selectedSub.tally.most.X || 0}) = <strong className="text-emerald-700">{selectedSub.tally.most.D + selectedSub.tally.most.I + selectedSub.tally.most.S + selectedSub.tally.most.C + (selectedSub.tally.most.X || 0)}</strong></p>
+                    <p>• Least (-): D({selectedSub.tally.least.D}) + I({selectedSub.tally.least.I}) + S({selectedSub.tally.least.S}) + C({selectedSub.tally.least.C}) + X({selectedSub.tally.least.X || 0}) = <strong className="text-emerald-700">{selectedSub.tally.least.D + selectedSub.tally.least.I + selectedSub.tally.least.S + selectedSub.tally.least.C + (selectedSub.tally.least.X || 0)}</strong></p>
+                  </div>
+                </div>
+
+                {/* SVG Visual Bar Comparison Chart */}
+                <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col justify-between">
+                  <h4 className="font-bold text-slate-800 text-sm mb-3 flex items-center space-x-2">
+                    <TrendingUp className="w-4 h-4 text-indigo-600" />
+                    <span>Grafik Perbandingan Dimensi (Net Score)</span>
+                  </h4>
+
+                  <div className="space-y-3 py-2">
+                    {[
+                      { key: 'D', name: 'Dominance', score: selectedSub.tally.change.D, color: 'bg-rose-500' },
+                      { key: 'I', name: 'Influence', score: selectedSub.tally.change.I, color: 'bg-amber-500' },
+                      { key: 'S', name: 'Steadiness', score: selectedSub.tally.change.S, color: 'bg-emerald-500' },
+                      { key: 'C', name: 'Conscientiousness', score: selectedSub.tally.change.C, color: 'bg-blue-500' },
+                    ].map((item) => {
+                      // Normalize bar width (-24 to +24 range)
+                      const clamped = Math.max(-20, Math.min(20, item.score));
+                      const percent = Math.round(((clamped + 20) / 40) * 100);
+
+                      return (
+                        <div key={item.key} className="space-y-1">
+                          <div className="flex justify-between text-xs font-bold">
+                            <span className="text-slate-700">
+                              {item.key} - {item.name}
+                            </span>
+                            <span className="font-mono text-slate-900">
+                              {item.score > 0 ? `+${item.score}` : item.score}
+                            </span>
+                          </div>
+                          <div className="w-full bg-slate-200 h-3 rounded-full overflow-hidden">
+                            <div
+                              className={`${item.color} h-full transition-all duration-500 rounded-full`}
+                              style={{ width: `${percent}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })}

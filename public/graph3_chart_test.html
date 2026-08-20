@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DISC Graph 3: CHANGE (Perceived Self)</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen p-4 sm:p-8 font-sans">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 p-6">
+    <div class="mb-6 border-b border-slate-200 pb-4 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-900">
+          DISC Assessment - Graph 3: CHANGE
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Visualisasi Koordinat Norm (-8 s/d +8) dari Skor Change (Perceived Self)
+        </p>
+      </div>
+      <div id="patternBadge" class="bg-indigo-900 text-white px-3 py-1.5 rounded-lg text-xs font-bold tracking-wider">
+        Pattern: -
+      </div>
+    </div>
+
+    <!-- Interactive Raw Score Inputs for Testing -->
+    <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-6">
+      <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
+        Input Raw Change Scores (-24 s/d +24):
+      </h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-rose-700 mb-1">D (Dominance)</label>
+          <input type="number" id="inputD" value="-10" min="-24" max="24" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-amber-700 mb-1">I (Influence)</label>
+          <input type="number" id="inputI" value="4" min="-24" max="24" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-amber-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-emerald-700 mb-1">S (Steadiness)</label>
+          <input type="number" id="inputS" value="8" min="-24" max="24" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-blue-700 mb-1">C (Compliance)</label>
+          <input type="number" id="inputC" value="-3" min="-24" max="24" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+        </div>
+      </div>
+      <button onclick="updateChartFromInput()" class="mt-4 w-full sm:w-auto px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-all shadow-sm">
+        Update Grafik Graph 3
+      </button>
+    </div>
+
+    <!-- Chart Container -->
+    <div class="relative w-full h-80 bg-white rounded-xl border border-slate-200 p-4">
+      <canvas id="graph3Canvas"></canvas>
+    </div>
+
+    <!-- Result Data Table -->
+    <div class="mt-6 pt-4 border-t border-slate-200 grid grid-cols-4 gap-3 text-center text-xs">
+      <div class="bg-rose-50 border border-rose-200 rounded-xl p-2.5">
+        <span class="font-bold text-rose-700 block text-sm">D</span>
+        <span class="text-slate-600 block text-[11px] mt-0.5">Change: <strong id="valRawD">-10</strong></span>
+        <span class="text-slate-600 block text-[11px]">Norm: <strong id="valNormD" class="text-slate-900">-4.3</strong></span>
+      </div>
+      <div class="bg-amber-50 border border-amber-200 rounded-xl p-2.5">
+        <span class="font-bold text-amber-700 block text-sm">I</span>
+        <span class="text-slate-600 block text-[11px] mt-0.5">Change: <strong id="valRawI">+4</strong></span>
+        <span class="text-slate-600 block text-[11px]">Norm: <strong id="valNormI" class="text-slate-900">+4.0</strong></span>
+      </div>
+      <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5">
+        <span class="font-bold text-emerald-700 block text-sm">S</span>
+        <span class="text-slate-600 block text-[11px] mt-0.5">Change: <strong id="valRawS">+8</strong></span>
+        <span class="text-slate-600 block text-[11px]">Norm: <strong id="valNormS" class="text-slate-900">+5.0</strong></span>
+      </div>
+      <div class="bg-blue-50 border border-blue-200 rounded-xl p-2.5">
+        <span class="font-bold text-blue-700 block text-sm">C</span>
+        <span class="text-slate-600 block text-[11px] mt-0.5">Change: <strong id="valRawC">-3</strong></span>
+        <span class="text-slate-600 block text-[11px]">Norm: <strong id="valNormC" class="text-slate-900">0.0</strong></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============================================================================
+    // STEP 1: NORM TABLE GRAPH 3 (Raw Change -24 to +24 -> Graph 3 Norm Score)
+    // ============================================================================
+    const normTableGraph3 = {
+      "-24": {"D": -8.0, "I": -8.0, "S": -8.0, "C": -8.0},
+      "-23": {"D": -8.0, "I": -8.0, "S": -8.0, "C": -8.0},
+      "-22": {"D": -8.0, "I": -8.0, "S": -8.0, "C": -7.5},
+      "-21": {"D": -7.5, "I": -8.0, "S": -8.0, "C": -7.3},
+      "-20": {"D": -7.0, "I": -8.0, "S": -8.0, "C": -7.3},
+      "-19": {"D": -6.8, "I": -8.0, "S": -8.0, "C": -7.0},
+      "-18": {"D": -6.75, "I": -7.0, "S": -7.5, "C": -6.7},
+      "-17": {"D": -6.7, "I": -6.7, "S": -7.3, "C": -6.7},
+      "-16": {"D": -6.5, "I": -6.7, "S": -7.3, "C": -6.7},
+      "-15": {"D": -6.3, "I": -6.7, "S": -7.0, "C": -6.5},
+      "-14": {"D": -6.1, "I": -6.7, "S": -6.5, "C": -6.3},
+      "-13": {"D": -5.9, "I": -6.7, "S": -6.5, "C": -6.0},
+      "-12": {"D": -5.7, "I": -6.7, "S": -6.5, "C": -5.85},
+      "-11": {"D": -5.3, "I": -6.7, "S": -6.5, "C": -5.85},
+      "-10": {"D": -4.3, "I": -6.5, "S": -6.0, "C": -5.7},
+      "-9": {"D": -3.5, "I": -6.0, "S": -4.7, "C": -4.7},
+      "-8": {"D": -3.25, "I": -5.7, "S": -4.3, "C": -4.3},
+      "-7": {"D": -3.0, "I": -4.7, "S": -3.5, "C": -3.5},
+      "-6": {"D": -2.75, "I": -4.3, "S": -3.0, "C": -3.0},
+      "-5": {"D": -2.5, "I": -3.5, "S": -2.0, "C": -2.5},
+      "-4": {"D": -1.5, "I": -3.0, "S": -1.5, "C": -0.5},
+      "-3": {"D": -1.0, "I": -2.0, "S": -1.0, "C": 0.0},
+      "-2": {"D": -0.5, "I": -1.5, "S": -0.5, "C": 0.3},
+      "-1": {"D": -0.25, "I": 0.0, "S": 0.0, "C": 0.5},
+      "0": {"D": 0.0, "I": 0.5, "S": 1.0, "C": 1.5},
+      "1": {"D": 0.5, "I": 1.0, "S": 1.5, "C": 3.0},
+      "2": {"D": 0.7, "I": 1.5, "S": 2.0, "C": 4.0},
+      "3": {"D": 1.0, "I": 3.0, "S": 3.0, "C": 4.3},
+      "4": {"D": 1.3, "I": 4.0, "S": 3.5, "C": 5.5},
+      "5": {"D": 1.5, "I": 4.3, "S": 4.0, "C": 5.7},
+      "6": {"D": 2.0, "I": 5.0, "S": 4.3, "C": 6.0},
+      "7": {"D": 2.5, "I": 5.5, "S": 4.7, "C": 6.3},
+      "8": {"D": 3.5, "I": 6.5, "S": 5.0, "C": 6.5},
+      "9": {"D": 4.0, "I": 6.7, "S": 5.5, "C": 6.7},
+      "10": {"D": 4.7, "I": 7.0, "S": 6.0, "C": 7.0},
+      "11": {"D": 4.85, "I": 7.3, "S": 6.2, "C": 7.3},
+      "12": {"D": 5.0, "I": 7.3, "S": 6.3, "C": 7.3},
+      "13": {"D": 5.5, "I": 7.3, "S": 6.5, "C": 7.3},
+      "14": {"D": 6.0, "I": 7.3, "S": 6.7, "C": 7.3},
+      "15": {"D": 6.3, "I": 7.3, "S": 7.0, "C": 7.3},
+      "16": {"D": 6.5, "I": 7.3, "S": 7.3, "C": 7.3},
+      "17": {"D": 6.7, "I": 7.3, "S": 7.3, "C": 7.5},
+      "18": {"D": 7.0, "I": 7.5, "S": 7.3, "C": 8.0},
+      "19": {"D": 7.3, "I": 8.0, "S": 7.3, "C": 8.0},
+      "20": {"D": 7.3, "I": 8.0, "S": 7.5, "C": 8.0},
+      "21": {"D": 7.5, "I": 8.0, "S": 8.0, "C": 8.0},
+      "22": {"D": 8.0, "I": 8.0, "S": 8.0, "C": 8.0},
+      "23": {"D": 8.0, "I": 8.0, "S": 8.0, "C": 8.0},
+      "24": {"D": 8.0, "I": 8.0, "S": 8.0, "C": 8.0}
+    };
+
+    let graph3ChartInstance = null;
+
+    // Helper: Lookup Norm Score from Change Score
+    function getNormScore(trait, rawScore) {
+      const entry = normTableGraph3[String(rawScore)];
+      return entry && entry[trait] !== undefined ? entry[trait] : 0;
+    }
+
+    // Helper: Calculate Pattern Code
+    function getPersonalityPattern(normD, normI, normS, normC) {
+      const traitNorms = [
+        { type: 'D', score: normD },
+        { type: 'I', score: normI },
+        { type: 'S', score: normS },
+        { type: 'C', score: normC },
+      ];
+      const positive = traitNorms.filter(t => t.score > 0);
+      if (positive.length === 0) return 'Invalid/Transisi';
+      positive.sort((a, b) => {
+        const diff = b.score - a.score;
+        if (diff !== 0) return diff;
+        const order = ['D', 'I', 'S', 'C'];
+        return order.indexOf(a.type) - order.indexOf(b.type);
+      });
+      if (positive.length === 1) return 'Pure ' + positive[0].type;
+      return positive.map(t => t.type).join('-');
+    }
+
+    // Custom Plugin to Draw Prominent Horizontal Zero-Line at Y=0
+    const zeroLinePlugin = {
+      id: 'zeroLinePlugin',
+      afterDraw(chart) {
+        const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+        const yZeroPixel = y.getPixelForValue(0);
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.strokeStyle = '#0f172a'; // Bold dark line
+        ctx.lineWidth = 2.5;
+        ctx.setLineDash([6, 3]); // Dashed style
+        ctx.moveTo(left, yZeroPixel);
+        ctx.lineTo(right, yZeroPixel);
+        ctx.stroke();
+
+        // Baseline Label
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText('Baseline (0.0)', left + 8, yZeroPixel - 6);
+        ctx.restore();
+      }
+    };
+
+    // ============================================================================
+    // MAIN FUNCTION: RENDER GRAPH 3 (Chart.js)
+    // ============================================================================
+    function renderGraph3(rawD, rawI, rawS, rawC) {
+      // 1. Map Raw Change scores to Norm Scores
+      const normD = getNormScore('D', rawD);
+      const normI = getNormScore('I', rawI);
+      const normS = getNormScore('S', rawS);
+      const normC = getNormScore('C', rawC);
+
+      const normData = [normD, normI, normS, normC];
+
+      // Update UI Text Display
+      document.getElementById('valRawD').textContent = (rawD > 0 ? '+' : '') + rawD;
+      document.getElementById('valNormD').textContent = (normD > 0 ? '+' : '') + normD;
+      document.getElementById('valRawI').textContent = (rawI > 0 ? '+' : '') + rawI;
+      document.getElementById('valNormI').textContent = (normI > 0 ? '+' : '') + normI;
+      document.getElementById('valRawS').textContent = (rawS > 0 ? '+' : '') + rawS;
+      document.getElementById('valNormS').textContent = (normS > 0 ? '+' : '') + normS;
+      document.getElementById('valRawC').textContent = (rawC > 0 ? '+' : '') + rawC;
+      document.getElementById('valNormC').textContent = (normC > 0 ? '+' : '') + normC;
+
+      const pattern = getPersonalityPattern(normD, normI, normS, normC);
+      document.getElementById('patternBadge').textContent = 'Pattern: ' + pattern;
+
+      const ctx = document.getElementById('graph3Canvas').getContext('2d');
+
+      // Destroy previous chart instance if existing
+      if (graph3ChartInstance) {
+        graph3ChartInstance.destroy();
+      }
+
+      // Create Chart.js Instance
+      graph3ChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['D', 'I', 'S', 'C'],
+          datasets: [{
+            label: 'Graph 3 Norm Score',
+            data: normData,
+            borderColor: '#4f46e5',
+            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            borderWidth: 3,
+            tension: 0, // Straight line connection
+            pointBackgroundColor: '#4f46e5',
+            pointBorderColor: '#ffffff',
+            pointBorderWidth: 2,
+            pointRadius: 6,
+            pointHoverRadius: 9,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const rawVals = [rawD, rawI, rawS, rawC];
+                  const rawVal = rawVals[context.dataIndex];
+                  const normVal = context.parsed.y;
+                  return [
+                    `Raw Change: ${rawVal > 0 ? '+' : ''}${rawVal}`,
+                    `Norm Score: ${normVal > 0 ? '+' : ''}${normVal}`
+                  ];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: '#f1f5f9'
+              },
+              ticks: {
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                },
+                color: '#334155'
+              }
+            },
+            y: {
+              min: -8,
+              max: 8,
+              ticks: {
+                stepSize: 2,
+                font: {
+                  size: 11
+                },
+                color: '#64748b'
+              },
+              grid: {
+                color: '#e2e8f0'
+              }
+            }
+          }
+        },
+        plugins: [zeroLinePlugin]
+      });
+    }
+
+    function updateChartFromInput() {
+      const d = parseInt(document.getElementById('inputD').value, 10) || 0;
+      const i = parseInt(document.getElementById('inputI').value, 10) || 0;
+      const s = parseInt(document.getElementById('inputS').value, 10) || 0;
+      const c = parseInt(document.getElementById('inputC').value, 10) || 0;
+      renderGraph3(d, i, s, c);
+    }
+
+    // Initial Render
+    window.addEventListener('DOMContentLoaded', () => {
+      renderGraph3(-10, 4, 8, -3);
+    });
+  </script>
+</body>
+</html>

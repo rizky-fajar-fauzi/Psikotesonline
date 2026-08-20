@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* Security Measures: Prevent Printing */
+
+
+/* Security Measures: Prevent Text Selection globally on interactive test areas */
+.no-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+
+@media print {
+  body {
+    background-color: white !important;
+  }
+  .no-print, button {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  /* Optional: make sure text colors are visible in print */
+  .print-black-text {
+    color: black !important;
+  }
+}
